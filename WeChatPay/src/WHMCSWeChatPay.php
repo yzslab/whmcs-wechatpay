@@ -80,7 +80,7 @@ class WHMCSWeChatPay
      * @param string $outTradeNo
      * @param string $prefix
      * @return int
-     * @throws WeChatPayException
+     * @throws InvalidOutTradeNoException
      */
     public static function outTradeNo2InvoiceId(string $outTradeNo, string $prefix): int
     {

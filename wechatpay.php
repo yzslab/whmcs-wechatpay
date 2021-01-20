@@ -172,7 +172,7 @@ checkInvoiceStatus();
 </script>
 ";
     } catch (\YunInternet\WHMCS\WeChatPay\Exceptions\WeChatPayException $weChatPayException) {
-        logActivity("message: " . $weChatPayException->getMessage() . ", code: " . $weChatPayException->getCode() . ", file:" . $weChatPayException->getFile() . ", line: #" . $weChatPayException->getLine() . "\n" . $weChatPayException->getTraceAsString(), 0);
+        logActivity("message: " . \YunInternet\WHMCS\WeChatPay\Common::throwable2String($weChatPayException), 0);
         return "<div style='color: red;'>二维码生成失败</div>";
     }
 }

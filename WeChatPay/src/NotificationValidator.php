@@ -34,7 +34,7 @@ class NotificationValidator
     {
         $message = "$timestamp\n$nonce\n$body\n";
         if ($this->verifier->verify($serialNo, $message, $signature) !== true) {
-            throw new InvalidSignatureException("invalid notification signature validate");
+            throw new InvalidSignatureException("invalid notification signature");
         }
 
         $decodedData = json_decode($body, true);
