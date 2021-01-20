@@ -3,8 +3,7 @@ require_once __DIR__ . '/../../../init.php';
 
 use \Illuminate\Database\Capsule\Manager as Capsule;
 
-$result = false;
-$message = "";
+$message = "Unpaid";
 
 $ca = new WHMCS_ClientArea();
 
@@ -23,12 +22,10 @@ if (is_null($invoice)) {
 }
 
 $status = $invoice->status;
-if ($invoice->status !== "Paid") {
+if ($invoice->status === "Paid") {
+    $message = "Paid";
     goto SEND_RESPONSE;
 }
 $result = true;
 SEND_RESPONSE:
-echo json_encode([
-    "result" => $result,
-    "message" => $message,
-]);
+echo $message;

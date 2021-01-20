@@ -146,28 +146,27 @@ function wechatpay_link($params)
 <script type='text/javascript' src='{$systemUrl}/modules/gateways/WeChatPay/qrcode.min.js'></script>
 <script type='text/javascript'>
 " . '
-$(function () {
 var qrcode = new QRCode(document.getElementById("wechat-pay-qr-code"), {
     text: "' . $link . '",
     width: 128,
     height: 128,
 });
 function checkInvoiceStatus() {
-$.ajax("' . $systemUrl . '/modules/gateways/WeChatPay/invoiceStatus.php", {
-dataType: "json",
-data: "invoiceId='. $params["invoiceid"] .'",
-method: "post",
-success: function (data) {
-if (data.result) {
-location.reload();
-} else {
-setTimeout(checkInvoiceStatus, 3000);
-}
-},
-});
+    var invoiceStatusXHR = new XMLHttpRequest();
+    invoiceStatusXHR.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            if (this.status === 200 && this.responseText === "Paid") {
+                location.reload();
+            } else {
+                setTimeout(checkInvoiceStatus, 3000);
+            }
+        }
+    };
+    invoiceStatusXHR.open("POST", "' . $systemUrl . '/modules/gateways/WeChatPay/invoiceStatus.php");
+    invoiceStatusXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    invoiceStatusXHR.send("invoiceId='. $params["invoiceid"] .'");
 }
 checkInvoiceStatus();
-});
 ' . "
 </script>
 ";
