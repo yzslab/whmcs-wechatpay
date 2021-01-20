@@ -94,7 +94,7 @@ function wechatpay_config()
             'Type' => 'text',
             'Size' => '8',
             'Default' => 'WXPAY',
-            'Description' => '加在WHMCS账单ID开头的字符串，通过这个可以解决订单号过短以及多系统使用同一个商户出现订单号重复的问题。<span style="color: red;">更改前请确定无未回调的订单，否则将导致未回调的订单出现异常。</span>',
+            'Description' => '加在WHMCS账单ID开头的字符串，通过这个可以解决多系统使用同一个商户出现订单号重复的问题。<span style="color: red;">更改前请确定无未回调的订单，否则将导致未回调的订单出现异常。</span>',
         ),
     );
 }
@@ -123,7 +123,7 @@ function wechatpay_link($params)
         ->set("appid", $params["appId"])
         ->set("mchid", $params["merchantId"])
         ->set("description", $params['companyname'] . " invoice #" . $params['invoiceid'])
-        ->set("out_trade_no", $params["invoiceIdPrefix"] . $params['invoiceid'])
+        ->set("out_trade_no", \YunInternet\WHMCS\WeChatPay\WHMCSWeChatPay::invoiceId2OutTradeNo($params['invoiceid'], $params["invoiceIdPrefix"]))
         ->set("notify_url", $systemUrl . '/modules/gateways/callback/wechatpay.php')
         ->set("amount", [
             "total" => intval($params['amount'] * 100),

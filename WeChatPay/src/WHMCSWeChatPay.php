@@ -8,6 +8,8 @@ use WechatPay\GuzzleMiddleware\Auth\WechatPay2Validator;
 use WechatPay\GuzzleMiddleware\Util\PemUtil;
 use YunInternet\WHMCS\WeChatPay\CertificateGetters\WeChatPayAPIv3CertificateGetter;
 use YunInternet\WHMCS\WeChatPay\CertificateRepositories\WHMCSDBCertificateRepository;
+use YunInternet\WHMCS\WeChatPay\Exceptions\InvalidOutTradeNoException;
+use YunInternet\WHMCS\WeChatPay\Exceptions\WeChatPayException;
 
 class WHMCSWeChatPay
 {
@@ -62,5 +64,41 @@ class WHMCSWeChatPay
     public function notificationValidate(): array
     {
         return $this->createValidator()->validate($_SERVER["HTTP_WECHATPAY_TIMESTAMP"], $_SERVER["HTTP_WECHATPAY_NONCE"], $_SERVER["HTTP_WECHATPAY_SERIAL"], $_SERVER["HTTP_WECHATPAY_SIGNATURE"], file_get_contents('php://input'));
+    }
+
+    /**
+     * @param string|int $invoiceId
+     * @param string $prefix
+     * @return string
+     */
+    public static function invoiceId2OutTradeNo($invoiceId, string $prefix): string
+    {
+        return $prefix . date("ymdhis") . "T" . $invoiceId;
+    }
+
+    /**
+     * @param string $outTradeNo
+     * @param string $prefix
+     * @return int
+     * @throws WeChatPayException
+     */
+    public static function outTradeNo2InvoiceId(string $outTradeNo, string $prefix): int
+    {
+        $prefixLength = strlen($prefix);
+        $prefixTotalLength = $prefixLength + 12;
+        if (strlen($outTradeNo) <= $prefixTotalLength) {
+            throw new InvalidOutTradeNoException("invalid length");
+        }
+        if (substr($outTradeNo, 0, $prefixLength) !== $prefix) {
+            throw new InvalidOutTradeNoException("invalid prefix");
+        }
+        if ($outTradeNo[$prefixTotalLength] !== "T") {
+            throw new InvalidOutTradeNoException("invalid format");
+        }
+        $invoiceId = substr($outTradeNo, $prefixTotalLength + 1);
+        if (is_numeric($invoiceId) === false) {
+            throw new InvalidOutTradeNoException("not an numeric");
+        }
+        return intval($invoiceId);
     }
 }

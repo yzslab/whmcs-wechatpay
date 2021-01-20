@@ -74,6 +74,10 @@ class WeChatPayAPIv3
     private function sendRequest($method, $uri, $options): ResponseInterface
     {
         try {
+            // 设置超时时间
+            if (array_key_exists("connect_timeout", $options) === false) {
+                $options["connect_timeout"] = 10;
+            }
             return $this->client->request($method, self::URL_PREFIX . $uri, $options);
         } catch (ClientException $e) {
             if ($e->hasResponse() && ($decodedResponse = json_decode($e->getResponse()->getBody()))) {
